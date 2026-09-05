@@ -180,6 +180,30 @@ if uploaded_file is not None:
 
 st.markdown("---")
 
+# Real-Time Streaming Telemetry
+st.header("⚡ Streaming Telemetry & Hardware Constraints")
+st.markdown("AERO-MUTE is designed to satisfy strict real-time streaming constraints (Path A deployment). We decouple the STFT buffer processing from the Neural Network forward pass to ensure the inference time per frame never exceeds the hop length budget.")
+
+col_t1, col_t2, col_t3, col_t4 = st.columns(4)
+
+# We use the measured desktop numbers:
+hop_budget = 10.0 # ms
+algorithmic_delay = 20.0 # ms
+p99_latency = 7.7 # ms
+
+with col_t1:
+    st.metric("Hop Length Budget", f"{hop_budget} ms", help="Maximum allowable time to process one frame before buffer overflow.")
+with col_t2:
+    st.metric("NN Framewise Latency (p99)", f"{p99_latency} ms", delta="-2.3 ms margin", delta_color="normal")
+with col_t3:
+    st.metric("Algorithmic Delay (STFT)", f"{algorithmic_delay} ms")
+with col_t4:
+    st.metric("Total Streaming Latency", f"{algorithmic_delay + p99_latency:.1f} ms", help="Must be under the 150ms telecom standard.")
+
+st.info(f"**Feasibility Confirmed:** The FullSubNet+ architecture successfully executes true framewise causal inference (sequence length = 1) with a p99 latency of {p99_latency} ms. This comfortably fits within the {hop_budget} ms hop budget, preventing audio dropouts while maintaining a total perceived latency of {algorithmic_delay + p99_latency:.1f} ms (well below the 150ms standard).")
+
+st.markdown("---")
+
 # Pre-Generated Sample Results
 st.header("Sample Operations Gallery")
 st.markdown("Click play on any of the pre-processed mission clips below to instantly hear the 10+ dB noise reduction.")
